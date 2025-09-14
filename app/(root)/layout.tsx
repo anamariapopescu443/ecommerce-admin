@@ -7,7 +7,7 @@ export default async function SetupLayout({
 }:{
     children: React.ReactNode;
 }){
-    const {userId}= auth();
+    const {userId}= await auth();
     if (!userId){
         redirect('/sign-in');
     }
@@ -18,7 +18,7 @@ export default async function SetupLayout({
         }
     });
     if(store){
-        redirect ('/${store.id}');
+        redirect (`/${store.id}`);
     }
     return(
         <>
