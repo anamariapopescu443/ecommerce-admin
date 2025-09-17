@@ -25,11 +25,15 @@ const ImageUpload: React.FC<ImageUploadProps>=({
         setIsMounted(true);
     }, []);
 
-   
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
+    
+    
     const onUpload =(result:any)=>{
         onChange(result.info.secure_url);
     }
+
+    
 
     if(!isMounted){
         return null;
@@ -48,6 +52,7 @@ const ImageUpload: React.FC<ImageUploadProps>=({
                         </div>
                         <Image
                         fill
+                        sizes="200px"
                         className="object-cover"
                         alt="Image"
                         src={url}
@@ -55,7 +60,20 @@ const ImageUpload: React.FC<ImageUploadProps>=({
                     </div>
                 )) }
             </div>
-            <CldUploadWidget onUpload={onUpload} uploadPreset="dcqj4xxls">
+            <CldUploadWidget 
+                onUpload={onUpload}
+                onSuccess={(result: any) => {
+                    try {
+                        if (result?.info?.secure_url) {
+                            onChange(result.info.secure_url as string);
+                        }
+                    } catch (e) {
+                        console.error('Widget onSuccess parse error', e);
+                    }
+                }}
+                uploadPreset="dcqj4xxls"
+                options={{ multiple: false, singleUploadAutoClose: false, showCompletedButton: true }}
+            >
                 {({open}) => {
                  const onClick=() => {
                     open();
