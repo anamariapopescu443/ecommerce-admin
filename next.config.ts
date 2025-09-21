@@ -5,7 +5,17 @@ const nextConfig: NextConfig = {
     domains:[
       "res.cloudinary.com"
     ]
-  } /* config options here */
+  },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // Use WatchIgnorePlugin instead of mutating read-only watchOptions
+      const webpackLib = require("webpack");
+      const pagefilePattern = /C:\\pagefile\.sys/i;
+      config.plugins = config.plugins || [];
+      config.plugins.push(new webpackLib.WatchIgnorePlugin({ paths: [pagefilePattern] }));
+    }
+    return config;
+  }
 };
 
 export default nextConfig;

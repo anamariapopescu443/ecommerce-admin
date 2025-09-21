@@ -4,17 +4,18 @@ import { NextResponse } from "next/server";
 
 export async function GET(
     req: Request,
-    { params }: { params: { colorId: string } }
+    { params }: { params: Promise<{ colorId: string }> }
 ) {
     try {
+        const { colorId } = await params;
 
-        if (!params.colorId) {
+        if (!colorId) {
             return new NextResponse("Color id is required", { status: 400 });
         }
 
         const color = await prismadb.color.findUnique({
             where: {
-                id: params.colorId,
+                id: colorId,
             },
         });
 
@@ -27,12 +28,13 @@ export async function GET(
 
 export async function PATCH(
     req: Request,
-    { params }: { params: {  storeId: string, colorId:string } }
+    { params }: { params: Promise<{  storeId: string, colorId:string }> }
 ) {
     try {
         const { userId } = await auth();
         const body = await req.json();
         const { name, value } = body ;
+        const { storeId, colorId } = await params;
 
         if (!userId) {
             return new NextResponse("Unauthenticated", { status: 401 });
@@ -45,12 +47,12 @@ export async function PATCH(
             return new NextResponse("ValueL is required", { status: 400 });
         }
 
-        if (!params.colorId) {
+        if (!colorId) {
             return new NextResponse("Color id is required", { status: 400 });
         }
         const storeByUserId= await prismadb.store.findFirst({
             where:{
-                id: params.storeId,
+                id: storeId,
                 userId
             }
         });
@@ -61,7 +63,7 @@ export async function PATCH(
 
         const color = await prismadb.color.updateMany({
             where: {
-                id: params.colorId,
+                id: colorId,
             },
             data: {
                 name,
@@ -78,21 +80,22 @@ export async function PATCH(
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { storeId: string ,colorId: string} }
+    { params }: { params: Promise<{ storeId: string ,colorId: string}> }
 ) {
     try {
         const { userId } = await auth();
+        const { storeId, colorId } = await params;
         if (!userId) {
             return new NextResponse("Unauthenticated", { status: 401 });
         }
 
-        if (!params.colorId) {
+        if (!colorId) {
             return new NextResponse("Color id is required", { status: 400 });
         }
 
         const storeByUserId= await prismadb.store.findFirst({
             where:{
-                id: params.storeId,
+                id: storeId,
                 userId
             }
         });
@@ -103,7 +106,7 @@ export async function DELETE(
 
         const color = await prismadb.color.deleteMany({
             where: {
-                id: params.colorId,
+                id: colorId,
             },
         });
 
